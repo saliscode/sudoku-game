@@ -1,0 +1,396 @@
+<!-- //AMALITECH FRONTEND 2 QUESTION 2
+
+//You are developing an interactive Sudoku game
+//On the preview page you can see a 9x9 grid. The objective 
+//of Sudoku is to fill the grid with digits so that each column, 
+//each row and each of the nine 3x3 sub-grids that compose the
+//grid contain all of the digits from 1 to 9.
+
+//Your task is to implement the functionality described below.
+
+
+//Acceptance Criteria.
+
+// Any part of the Sudoku grid that is incorrect (a row, a colun, or a 3x3 sub-grid) 
+// should have a red background colored-#ff0000.
+//All other cells should have a white background-#ffffff
+
+// Note
+
+// You may use a CSS class sudoku-table_cell_wrong for background coloring or do it manually.
+// The template already contains the code that renders the grid. Your task is to provide the 
+// implementations for the getStatus() function.
+// Tou can expand the test results to see a more detailed report.
+// Please use the provided template, as the tests access the elements by using the CSS selectors.
+// If you change the structure of the DOM elements the tests will fail. 
+-->
+
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- <link rel="stylesheet" type="text/css" href="./job-list.css" /> -->
+
+  <!-- <link rel="preconnect" href="https://fonts.googleapis.com"> -->
+  <!-- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
+  <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@500;700&display=swap" rel="stylesheet">
+
+  <title>Sudoku</title>
+
+  <style>
+   .sudoku-container{
+    /* margin: 10px; */
+    font: 20px sans-serif;
+    text-align: center;
+    /* background-color: #ff0000; */
+
+   }
+ .sudoku-table{
+    margin:auto;
+    /* border-collapse: collapse; */
+    border-left: solid;
+    border-top: solid;
+    border-right: solid;
+    background-color: lightgreen;
+    width: 400px;
+    height: 400px;
+ }
+
+ .sudoku-table_row:nth-of-type(3n) {
+    border-bottom: 1px black solid;
+    /* background-color: yellow; */
+ }
+/* 
+ .sudoku-table_row:nth-of-type(3n) {
+    border-bottom: solid;
+    background-color: yellow;
+ } */
+
+ /* this is the styling for each cell */
+ .sudoku-table_cell{
+    padding: 10px;
+    border:1px solid black;
+    background-color: #ffffff;
+    
+ }
+
+ .sudoku-table_cell:nth-of-type(3n) {
+  
+        border-right: solid;
+        /* background-color: white; */
+    }
+
+ .sudoku-table__cell--wrong{
+    background-color: #ff0000;
+ } 
+
+  </style>
+</head>
+
+<body class = "main">
+        <div class = "sudoku-container"></div>
+</body>
+<script>
+function checkRows(table){
+    for (let i = 0; i < 9; i++) {
+        const row = table[i];
+        const ram = [];
+        for (let j = 0; j < 9; j++) {
+          const digi = row[j];
+          if (ram.includes(digi) && digi != 0) {
+            for (let l = 0; l < 9; l++) {
+              document
+                .querySelector('.sudoku-table')
+                .rows[i].cells[l].classList.add('sudoku-table__cell--wrong');
+            }
+          } else {
+            ram.push(digi);
+          }
+        }
+      }
+}
+
+function checkColumns(table) {
+    for (let col = 0; col < table.length; col++) {
+        let columnValues = [];
+        for (const element of table) {
+    
+          const value = element[col];
+    
+          if (columnValues.includes(value) && value != 0) {
+            for (let i = 0; i < table.length; i++) {
+              document
+                .querySelector('.sudoku-table')
+                .rows[i].cells[col].classList.add('sudoku-table__cell--wrong');
+            }
+          } else {
+            columnValues.push(value);
+          }
+        }
+      }
+}
+
+function checkGrid(table, startRow, endRow, startColumn, endColumn) {
+    const subGrid = [];
+
+    for (let i = startRow; i < endRow; i++) {
+      for (let j = startColumn; j < endColumn; j++) {
+        const val = table[i][j];
+
+        if (subGrid.includes(val) && val != 0) {
+          for (let k = startRow; k < endRow; k++) {
+            for (let l = startColumn; l < endColumn; l++) {
+              document
+                .querySelector('.sudoku-table')
+                .rows[k].cells[l].classList.add('sudoku-table__cell--wrong');
+            }
+          }
+        } else {
+          subGrid.push(table[i][j]);
+        }
+      }
+    }
+  }
+function checkField() {
+  
+  let table = [];
+  for (let row = 0; row < 9; row++) {
+    table.push([]);
+    for (let col = 0; col < 9; col++) {
+      let val =
+        document.querySelector('.sudoku-table').rows[row].cells[col].innerHTML;
+      document
+        .querySelector('.sudoku-table')
+        .rows[row].cells[col].classList.remove('sudoku-table__cell--wrong');
+      table[row][col] = val ? parseInt(val) : 0;
+    }
+  }
+
+  checkRows(table)
+  checkColumns(table);
+
+  checkGrid(table, 0, 3, 0, 3);
+  checkGrid(table, 0, 3, 3, 6);
+  checkGrid(table, 0, 3, 6, 9);
+
+  checkGrid(table, 3, 6, 0, 3);
+  checkGrid(table, 3, 6, 3, 6);
+  checkGrid(table, 3, 6, 6, 9);
+
+  checkGrid(table, 6, 9, 0, 3);
+  checkGrid(table, 6, 9, 3, 6);
+  checkGrid(table, 6, 9, 6, 9);
+}
+
+const table = document.createElement('table');
+table.classList.add('sudoku-table');
+document.getElementsByClassName('sudoku-container')[0].appendChild(table);
+const initialField = [
+  [4, 8, 1, 2, 5, 3, 6, 9, 7],
+  [2, 6, 7, 9, 4, 8, 1, , 5],
+  [5, 3, 9, 6, 7, 1, 2, , 4],
+  [6, 5, 4, 3, 8, 9, 7, 1, 2],
+  [9, , 8, 7, , 4, 5, 6, 3],
+  [1, 7, 3, 5, 6, 2, 8, 4, 9],
+  [7, , 2, 1, 3, 6, 9, 5, 8],
+  [3, 1, 5, 8, 9, 7, 4, 2, 6],
+  [8, 9, 6, 4, 2, 5, 3, 7, 1],
+];
+for (let i = 0; i < initialField.length; i++) {
+  const row = document.createElement('tr');
+  row.classList.add('sudoku-table__row');
+  table.appendChild(row);
+  for (let j = 0; j < initialField[0].length; j++) {
+    const cell = document.createElement('td');
+    cell.classList.add('sudoku-table_cell');
+    cell.contentEditable = true;
+    cell.onkeyup = checkField;
+    if (initialField[i][j]) {
+      cell.innerHTML = initialField[i][j];
+    }
+    row.appendChild(cell);
+  }
+}
+
+
+</script>
+
+
+
+<script>
+
+  //     function getStatus() {
+//   let table = [];
+//   // Create an empty array to hold the values of the Sudoku table
+//   for (let row = 0; row < 9; row++) {
+//     table.push([]);
+//     // Add a new empty array to the table array for each row
+//     for (let col = 0; col < 9; col++) {
+//       let val = document.querySelector('.sudoku-table').rows[row].cells[col].innerHTML;
+//       // Get the value of the cell in the Sudoku table
+//       table[row][col] = val ? parseInt(val) : 0;
+//       // If the cell has a value, parse it as an integer and add it to the table array. Otherwise, add 0.
+//     }
+//   }
+  
+//   for (let i = 0; i < 9; i++) {
+//     // Check rows
+//     let rowSet = new Set(table[i]);
+//     // Create a new set containing the values in the current row of the Sudoku table
+//     if (rowSet.size !== 9) {
+//       // If the set does not contain 9 unique values, there is a duplicate value in the row
+//       for (let j = 0; j < 9; j++) {
+//         document.querySelector('.sudoku-table').rows[i].cells[j].classList.add('sudoku-table_cell--wrong');
+//         // Add a "wrong" class to the cell in the Sudoku table
+//       }
+//     }
+    
+//     // Check columns
+//     let colSet = new Set(table.map(row => row[i]));
+//     // let colSet = new Set(table.map(row => row[i]));
+//     // Create a new set containing the values in the current column of the Sudoku table
+//     if (colSet.size !== 9) {
+//       // If the set does not contain 9 unique values, there is a duplicate value in the column
+//       for (let j = 0; j < 9; j++) {
+//         document.querySelector('.sudoku-table').rows[j].cells[i].classList.add('sudoku-table_cell--wrong');
+//         // Add a "wrong" class to the cell in the Sudoku table
+//       }
+//     }
+//   }
+  
+//   for (let i = 0; i < 9; i += 3) {
+//     for (let j = 0; j < 9; j += 3) {
+//       // Check 3x3 sub-grids
+//       let subgridSet = new Set(table.slice(i, i + 3).flatMap(row => row.slice(j, j + 3)));
+//       // Create a new set containing the values in the current 3x3 sub-grid of the Sudoku table
+//       if (subgridSet.size !== 9) {
+//         // If the set does not contain 9 unique values, there is a duplicate value in the sub-grid
+//         for (let row = i; row < i + 3; row++) {
+//           for (let col = j; col < j + 3; col++) {
+//             document.querySelector('.sudoku-table').rows[row].cells[col].classList.add('sudoku-table_cell--wrong');
+//             // Add a "wrong" class to the cell in the Sudoku table
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
+
+// getStatus()
+// 
+
+</script>
+
+<script>
+
+
+
+//     function checkField() {
+//     let table = [];
+//     for (let row = 0; row < 9; row++) {
+//         table.push([]);
+//         for(let col = 0; col < 9; col++) {
+//             let val = document.querySelector('.sudoku-table')
+//                .rows[row]
+//                .cells[col]
+//                .innerHTML;
+
+//             document.querySelector('.sudoku-table')
+//                .rows[row]
+//                .cells[col]
+//                .classList.remove('.sudoku-table_cell--wrong');
+//             table[row][col] = val ? parseInt(val) : 0;
+
+//            // console.log("ROW: "+row,"COL: "+col)
+//         }
+           
+      
+//     }
+//     //TODO: Write your code here..
+//     let myRow = null;
+//     let myCol = null;
+//     for (let row = 0; row < 9; row++) {
+//       table.push([]);
+//       for (let col = 0; col < 9; col++) {
+//         let val = document.querySelector('.sudoku-table').rows[row].cells[col].innerHTML;
+//         let field = document.querySelector('.sudoku-table').rows[row].cells[col];
+//         field.addEventListener("input",function() {
+
+//           // console.log("value", e.data)
+//           // console.log("ROW: " + (row + 1), "COL: " + (col + 1))
+//         })
+//       }
+//     }
+    
+
+//   }  
+
+
+
+// const table = document.createElement('table');
+// table.classList.add('sudoku-table');
+// document.getElementsByClassName('sudoku-container')[0].appendChild(table);
+
+// const initialField = [
+//     [4, 8, 1, 2, 5, 3, 6, 9, 7],
+//     [2, 6, 7, 9, 4, 8, 1,  , 5],
+//     [5, 3, 9, 6, 7, 1, 2,  , 4],
+//     [6, 5, 4, 3, 8, 9, 7, 1, 2],
+//     [9,  , 8, 7,  , 4, 5, 6, 3],
+//     [1, 7, 3, 5, 6, 2, 8, 4, 9],
+//     [7,  , 2, 1, 3, 6, 9, 5, 8],
+//     [3, 1, 5, 8, 9, 7, 4, 2, 6],
+//     [8, 9, 6, 4, 2, 5, 3, 7, 1],
+// ];
+
+// for (let i = 0; i < initialField.length; i++) {
+//     const row = document.createElement('tr');
+//     row.classList.add('sudoku-table_row');
+//     table.appendChild(row);
+//     for(let j = 0; j < initialField[0].length; j++) {
+//         const cell = document.createElement('td');
+//         cell.classList.add('.sudoku-table_cell');
+//         cell.contentEditable = true;
+//         cell.onkeyup = checkField;
+//         if(initialField[i][j]) {
+//             cell.innerHTML = initialField[i][j];
+//             // console.log(i,j)
+//         }
+//         row.appendChild(cell);
+
+//         cell.addEventListener('input',function(){
+//           console.log(i,j)
+//         })
+//     }
+// }
+
+// for (let i = 0; i < initialField.length; i++) {
+  
+    // for(let j = 0; j < initialField[0].length; j++) {
+        // const cell = document.createElement('td');
+        // cell.addEventListener('input', function(){
+          // console.log(i,j)
+        // })
+    // }
+// }
+
+// for (let j = 0; j < initialField[0].length; j++) {
+//   const cell = document.createElement('td');
+//   cell.addEventListener('input', () => {
+//     console.log(j)
+//   })
+// }
+
+
+
+
+</script>
+
+</html>
+
+
